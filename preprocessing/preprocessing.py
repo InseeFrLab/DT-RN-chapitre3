@@ -2,14 +2,16 @@ import geopandas as gpd
 from sklearn.cluster import DBSCAN
 import math
 import numpy as np
-
+import tensorflow as tf
 
 def get_parcel_data(department, save=False, file=None):
     if save & (file is None):
         raise ValueError("The file option must be filled when the save option is True.")
 
     url_cadastre = "https://cadastre.data.gouv.fr/data/etalab-cadastre/2020-07-01/shp/departements/"
-    parcel = gpd.read_file(url_cadastre + f'{department}/cadastre-{department}-parcelles-shp.zip')
+    parcel = gpd.read_file(
+        url_cadastre + f"{department}/cadastre-{department}-parcelles-shp.zip"
+    )
     if save:
         parcel.to_file(file, driver="GeoJSON")
 
@@ -83,3 +85,36 @@ def get_dim_image(limits):
     height = int((limits["max_y"] - limits["min_y"]) / 4)
     width = int((limits["max_x"] - limits["min_x"]) / 4)
     return (height, width)
+
+
+def create_compact_object(borders, areas, cities):
+    data = np.zeros((borders.shape[0], borders.shape[1], 3), dtype="uint8")
+    data[:, :, 0] = borders
+    data[:, :, 1] = cities
+    data[:, :, 2] = areas
+    return data
+
+def create_compact_object(borders, areas, cities):
+    data = np.zeros((borders.shape[0], borders.shape[1], 3), dtype="uint8")
+    data[:, :, 0] = borders
+    data[:, :, 1] = cities
+    data[:, :, 2] = areas
+    return data
+
+def get_significant_images(patch, parcel_area_threshold):
+    # On s'assure qu'un certain pourcentage de la surface est dans une parcelle cadastrale
+    pixel_per_image = np.sum(patch, axis=(1,2))
+    idx = (pixel_per_image[:,2] >= 256*256*parcel_area_threshold) 
+    return patch[idx]
+
+def get_labels(patch, city_area_threshold):
+    pixel_per_image = np.sum(patch, axis=(1,2))
+    idx = 256*256* city_area_threshold < pixel_per_image[:,1]
+    return np.array([2 if image else 0 for image in idx ])
+
+def generate_artificial_images(images):
+    artificial_data = (tf.image.flip_up_down(images),
+                       tf.image.flip_left_right(images),
+                       tf.image.random_flip_up_down(images),
+                       tf.image.random_flip_left_right(images))
+    return np.vstack(artificial_data)
