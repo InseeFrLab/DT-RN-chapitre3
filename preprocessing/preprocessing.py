@@ -107,10 +107,17 @@ def get_significant_images(patch, parcel_area_threshold):
     idx = (pixel_per_image[:,2] >= 256*256*parcel_area_threshold) 
     return patch[idx]
 
-def get_labels(patch, city_area_threshold):
-    pixel_per_image = np.sum(patch, axis=(1,2))
-    idx = 256*256* city_area_threshold < pixel_per_image[:,1]
-    return np.array([2 if image else 0 for image in idx ])
+
+def get_labels(patch, department, city_area_threshold):
+    if department == 50:
+        label = 0
+    else:
+        label = 1
+
+    pixel_per_image = np.sum(patch, axis=(1, 2))
+    idx = 256 * 256 * city_area_threshold < pixel_per_image[:, 1]
+    return np.array([2 if image else label for image in idx])
+
 
 def generate_artificial_images(images):
     artificial_data = (tf.image.flip_up_down(images),

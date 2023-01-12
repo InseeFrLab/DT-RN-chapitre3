@@ -42,7 +42,7 @@ for dep in [50, 51]:
     data_3d = prep.create_compact_object(raster_bounds, raster_areas, raster_villes)
     patch = image.extract_patches_2d(data_3d, (256, 256), max_patches=25000)
     patch = prep.get_significant_images(patch, 0.8)
-    y = prep.get_labels(patch, 0.5)
+    y = prep.get_labels(patch, dep, 0.5)
     artificial_images = prep.generate_artificial_images(patch[y == 2])
     patch = np.vstack((patch, artificial_images))
     # On ne conserve que la couche des contours des parcelles
