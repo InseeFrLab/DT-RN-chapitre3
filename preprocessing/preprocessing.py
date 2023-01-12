@@ -4,21 +4,16 @@ import math
 import numpy as np
 import tensorflow as tf
 
-def get_parcel_data(department, save=False, file=None):
-    if save & (file is None):
-        raise ValueError("The file option must be filled when the save option is True.")
 
+def get_parcel_data(department):
     url_cadastre = "https://cadastre.data.gouv.fr/data/etalab-cadastre/2020-07-01/shp/departements/"
     parcel = gpd.read_file(
         url_cadastre + f"{department}/cadastre-{department}-parcelles-shp.zip"
     )
-    if save:
-        parcel.to_file(file, driver="GeoJSON")
-
     return parcel
 
 
-def get_urbanisation_data(department, save=False, file=None):
+def get_urbanisation_data(department):
 
     # Ce notebook donne un exemple de calcul d'emprise de villes. Il ne s'agit pas de "tâche urbaine" au sens usuel du terme mais uniquement de calcul de zone convexe concentrant des bâtiments.
 
@@ -27,9 +22,6 @@ def get_urbanisation_data(department, save=False, file=None):
     #     les regroupements de bâtiments sont calculés à partir des centroïdes des objets géométriques
     #     le calcul est réalisé sur un seul département. Il faudrait prendre en compte les départements limitrophes pour tenir compte des effets de bords.
     #     les regroupements sont obtenus à l'aide de l'algorithme DBSCAN
-
-    if save & (file is None):
-        raise ValueError("The file option must be filled when the save option is True.")
 
     url_cadastre = "https://cadastre.data.gouv.fr/data/etalab-cadastre/2020-07-01/shp/departements/"
     bats = gpd.read_file(
@@ -59,8 +51,6 @@ def get_urbanisation_data(department, save=False, file=None):
     # ## On sauvegarde les résultats :##
     # calcul des coordonées dans le systeme WSG84
     villages = villages.to_crs(epsg=2154)
-    if save:
-        villages.to_file(file, driver="GeoJSON")
 
     return villages
 
@@ -94,6 +84,7 @@ def create_compact_object(borders, areas, cities):
     data[:, :, 2] = areas
     return data
 
+
 def create_compact_object(borders, areas, cities):
     data = np.zeros((borders.shape[0], borders.shape[1], 3), dtype="uint8")
     data[:, :, 0] = borders
@@ -101,10 +92,11 @@ def create_compact_object(borders, areas, cities):
     data[:, :, 2] = areas
     return data
 
+
 def get_significant_images(patch, parcel_area_threshold):
     # On s'assure qu'un certain pourcentage de la surface est dans une parcelle cadastrale
-    pixel_per_image = np.sum(patch, axis=(1,2))
-    idx = (pixel_per_image[:,2] >= 256*256*parcel_area_threshold) 
+    pixel_per_image = np.sum(patch, axis=(1, 2))
+    idx = pixel_per_image[:, 2] >= 256 * 256 * parcel_area_threshold
     return patch[idx]
 
 
@@ -120,8 +112,10 @@ def get_labels(patch, department, city_area_threshold):
 
 
 def generate_artificial_images(images):
-    artificial_data = (tf.image.flip_up_down(images),
-                       tf.image.flip_left_right(images),
-                       tf.image.random_flip_up_down(images),
-                       tf.image.random_flip_left_right(images))
+    artificial_data = (
+        tf.image.flip_up_down(images),
+        tf.image.flip_left_right(images),
+        tf.image.random_flip_up_down(images),
+        tf.image.random_flip_left_right(images),
+    )
     return np.vstack(artificial_data)

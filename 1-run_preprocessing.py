@@ -8,8 +8,10 @@ from sklearn.model_selection import train_test_split
 dep_images_labels = {}
 
 for dep in [50, 51]:
-    # parcelles = prep.get_parcel_data(dep)
-    parcelles = gpd.read_file(f"data/parcelles_{dep}.geojson")
+    print(f"\nBuilding dataset for department ${dep}...\n")
+    parcelles = prep.get_parcel_data(dep)
+    parcelles.to_file(f"data/villages_{dep}.geojson", driver="GeoJSON")
+    print("\n*** Parcels data retrieved!\n")
 
     limites = prep.get_parcel_limits(parcelles)
 
@@ -18,12 +20,16 @@ for dep in [50, 51]:
     raster_areas = features.rasterize(
         geo_parcelles, prep.get_dim_image(limites), fill=0, all_touched=True
     )
+    np.save(f"raster_areas_${dep}.npy", raster_areas)
 
     raster_bounds = features.rasterize(
         geo_parcelles.boundary, prep.get_dim_image(limites), fill=0, all_touched=True
     )
+    np.save(f"raster_bounds_${dep}.npy", raster_bounds)
 
-    villages = gpd.read_file(f"data/villages_{dep}.geojson")
+    villages = prep.get_urbanisation_data(dep)
+    villages.to_file(f"data/villages_{dep}.geojson", driver="GeoJSON")
+    print("\n*** Cities data retrieved!\n")
 
     filter = [
         (limites["max_x"] >= geo.bounds[0])
@@ -38,16 +44,21 @@ for dep in [50, 51]:
     raster_villes = features.rasterize(
         geo_villages, prep.get_dim_image(limites), fill=0, all_touched=True
     )
+    np.save(f"raster_villes_${dep}.npy", raster_villes)
+    print("\n*** Rasters built!\n")
 
     data_3d = prep.create_compact_object(raster_bounds, raster_areas, raster_villes)
     patch = image.extract_patches_2d(data_3d, (256, 256), max_patches=25000)
     patch = prep.get_significant_images(patch, 0.8)
     y = prep.get_labels(patch, dep, 0.5)
+    print("\n*** Data labeled!\n")
+
     artificial_images = prep.generate_artificial_images(patch[y == 2])
     patch = np.vstack((patch, artificial_images))
     # On ne conserve que la couche des contours des parcelles
     patch = patch[:, :, :, 0]
     y = np.hstack((y, 2 * np.ones(artificial_images.shape[0])))
+    print("\n*** Artificial data added!\n")
 
     dep_images_labels[dep] = {"X": patch, "Y": y}
 
