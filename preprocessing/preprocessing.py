@@ -111,3 +111,10 @@ def generate_artificial_images(images):
         tf.image.random_flip_left_right(images),
     )
     return np.vstack(artificial_data)
+
+
+def keep_only_enough_pixels(Y, X, min_pixel):
+    non_zero_pixels = np.sum(X, axis=(1, 2)).reshape(X.shape[0])
+    Y = Y[(non_zero_pixels >= min_pixel)]
+    X = X[(non_zero_pixels >= min_pixel)]
+    return (Y, X)
