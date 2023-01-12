@@ -1,5 +1,7 @@
 from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from keras.models import Model, Sequential
+import numpy as np
+
 
 def define_model_structure(
     input_dim,
@@ -55,7 +57,7 @@ def define_model_structure(
                 activation=activations[nb_conv_layers + dense_lay],
             )
         )
-    
+
     nb_layers = len(filters) * 2 + len(dim_dense_layers) + 1
     input_used = Input(shape=input_dim)
     layers = model.layers[0](input_used)
@@ -63,3 +65,11 @@ def define_model_structure(
         layers = model.layers[i](layers)
 
     return Model(input_used, layers)
+
+
+def get_accuracy(model, X_test, Y_test):
+    predictions = model.predict(X_test)
+    Y_predicted = np.argmax(predictions, axis=1)
+    Y_true = np.argmax(y_test, axis=1)
+
+    return np.mean(Y_true == Y_predicted)
