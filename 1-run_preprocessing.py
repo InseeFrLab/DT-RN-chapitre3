@@ -1,9 +1,9 @@
 import preprocessing.preprocessing as prep
-import geopandas as gpd
 import numpy as np
 from rasterio import features
 from sklearn.feature_extraction import image
 from sklearn.model_selection import train_test_split
+import keras 
 
 dep_images_labels = {}
 
@@ -65,14 +65,26 @@ for dep in [50, 51]:
 full_patch = np.vstack((dep_images_labels[50]["X"], dep_images_labels[51]["X"]))
 y = np.hstack((dep_images_labels[50]["Y"], dep_images_labels[51]["Y"]))
 
+y, full_patch = prep.keep_only_enough_pixels(y, full_patch, 1000)
+
+y = keras.utils.to_categorical(y, 3)
+
 x_train, x_test, y_train, y_test = train_test_split(
     full_patch, y, test_size=0.2, random_state=42, shuffle=True
 )
 
+x_train, x_validation, y_train, y_validation = train_test_split(
+    x_train, y_train, test_size=0.2, random_state=42, shuffle=True
+)
+
 x_train = x_train[:, :, :, np.newaxis]
 x_test = x_test[:, :, :, np.newaxis]
+x_validation = x_validation[:, :, :, np.newaxis]
 
-np.save('data/x_train.npy', x_train)
-np.save('data/y_train.npy', y_train)
-np.save('data/x_test.npy', x_test)
-np.save('data/y_test.npy', y_test)
+np.save("data/x_train.npy", x_train)
+np.save("data/y_train.npy", y_train)
+np.save("data/x_test.npy", x_test)
+np.save("data/y_test.npy", y_test)
+np.save("data/x_validation.npy", x_validation)
+np.save("data/y_validation.npy", y_validation)
+
