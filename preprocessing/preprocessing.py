@@ -85,14 +85,6 @@ def create_compact_object(borders, areas, cities):
     return data
 
 
-def create_compact_object(borders, areas, cities):
-    data = np.zeros((borders.shape[0], borders.shape[1], 3), dtype="uint8")
-    data[:, :, 0] = borders
-    data[:, :, 1] = cities
-    data[:, :, 2] = areas
-    return data
-
-
 def get_significant_images(patch, parcel_area_threshold):
     # On s'assure qu'un certain pourcentage de la surface est dans une parcelle cadastrale
     pixel_per_image = np.sum(patch, axis=(1, 2))

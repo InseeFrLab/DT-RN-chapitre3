@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 dep_images_labels = {}
 
 for dep in [50, 51]:
-    print(f"\nBuilding dataset for department ${dep}...\n")
+    print(f"\nBuilding dataset for department {dep}...\n")
     parcelles = prep.get_parcel_data(dep)
     parcelles.to_file(f"data/villages_{dep}.geojson", driver="GeoJSON")
     print("\n*** Parcels data retrieved!\n")
@@ -20,12 +20,12 @@ for dep in [50, 51]:
     raster_areas = features.rasterize(
         geo_parcelles, prep.get_dim_image(limites), fill=0, all_touched=True
     )
-    np.save(f"raster_areas_${dep}.npy", raster_areas)
+    np.save(f"data/raster_areas_{dep}.npy", raster_areas)
 
     raster_bounds = features.rasterize(
         geo_parcelles.boundary, prep.get_dim_image(limites), fill=0, all_touched=True
     )
-    np.save(f"raster_bounds_${dep}.npy", raster_bounds)
+    np.save(f"data/raster_bounds_{dep}.npy", raster_bounds)
 
     villages = prep.get_urbanisation_data(dep)
     villages.to_file(f"data/villages_{dep}.geojson", driver="GeoJSON")
@@ -44,7 +44,7 @@ for dep in [50, 51]:
     raster_villes = features.rasterize(
         geo_villages, prep.get_dim_image(limites), fill=0, all_touched=True
     )
-    np.save(f"raster_villes_${dep}.npy", raster_villes)
+    np.save(f"data/raster_villes_{dep}.npy", raster_villes)
     print("\n*** Rasters built!\n")
 
     data_3d = prep.create_compact_object(raster_bounds, raster_areas, raster_villes)
@@ -65,11 +65,14 @@ for dep in [50, 51]:
 full_patch = np.vstack((dep_images_labels[50]["X"], dep_images_labels[51]["X"]))
 y = np.hstack((dep_images_labels[50]["Y"], dep_images_labels[51]["Y"]))
 
-
 x_train, x_test, y_train, y_test = train_test_split(
     full_patch, y, test_size=0.2, random_state=42, shuffle=True
 )
 
-
 x_train = x_train[:, :, :, np.newaxis]
 x_test = x_test[:, :, :, np.newaxis]
+
+np.save('data/x_train.npy', x_train)
+np.save('data/y_train.npy', y_train)
+np.save('data/x_test.npy', x_test)
+np.save('data/y_test.npy', y_test)
