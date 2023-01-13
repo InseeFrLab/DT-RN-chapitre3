@@ -70,6 +70,6 @@ def define_model_structure(
 def get_accuracy(model, X_test, Y_test):
     predictions = model.predict(X_test)
     Y_predicted = np.argmax(predictions, axis=1)
-    Y_true = np.argmax(y_test, axis=1)
+    Y_true = np.argmax(Y_test, axis=1)
 
     return np.mean(Y_true == Y_predicted)
