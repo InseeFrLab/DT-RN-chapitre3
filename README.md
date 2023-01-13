@@ -30,12 +30,14 @@ Les programmes de cette partie sont écrit en **python**. Le réseau (CNN) est r
 
 Le code se divise en 4 scripts distincts :
 
-    1-run_preprocessiong.py : Ce code consitue les échantillons de tests et d'entrainements de notre réseau de neurones. Pour cela :    
-        - Il importe les données du cadastre (département de la Manche et de la Marne), ainsi que les empreintes des villages ;
-        - Il transforme les données géométrique en images (rasters) ;
-        - Il tire des échantillons d'images et crée les labels (suppression des images peu ou pas du tout remplies, identification des villes) ;
-        - Il réalise le sur_échantillonage des villes, sous représentées.
+- 1-run_preprocessiong.py : Ce code consitue les échantillons de tests et d'entrainements de notre réseau de neurones. Pour cela :    
+    - Il importe les données du cadastre (département de la Manche et de la Marne), ainsi que les empreintes des villages ;
+    - Il transforme les données géométrique en images (rasters) ;
+    - Il tire des échantillons d'images et crée les labels (suppression des images peu ou pas du tout remplies, identification des villes) ;
+    - Il réalise le sur_échantillonage des villes, sous représentées.
 
-    2-run_CNN.py : Ce code permets de définir la structure du réseau de neurones que l'on souhaite estimer à l'aide de la librairie Keras. Il montre comment la sélection des hyperparamètres (nombre de couches de convolutions, profondeur et taille des filtres) peut être réalisées. Enfin il met illustre également l'algorithme de Grad-CAM.
-    
-    3-run_random_forest.py : Ce script présente un modèle alternatif pour réaliser la même tâche de classification. Il estime une forêt aléatoire à l'aide de features préalablement construites.
+- 2-run_CNN.py : Ce code permets de définir la structure du réseau de neurones que l'on souhaite estimer à l'aide de la librairie Keras. Il montre comment la sélection des hyperparamètres (nombre de couches de convolutions, profondeur et taille des filtres) peut être réalisées. Enfin il met illustre également l'algorithme de Grad-CAM.
+
+- 3-run_random_forest.py : Ce script présente un modèle alternatif pour réaliser la même tâche de classification. Il estime une forêt aléatoire à l'aide de features préalablement construites.
+
+Les codes ont été écrits par [Stéphanie Himpens](https://github.com/srhimp) (Insee / Banque de France).
