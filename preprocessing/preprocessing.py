@@ -16,12 +16,15 @@ def get_parcel_data(department):
 
 def get_urbanisation_data(department, epsg):
 
-    # Ce notebook donne un exemple de calcul d'emprise de villes. Il ne s'agit pas de "tâche urbaine" au sens usuel du terme mais uniquement de calcul de zone convexe concentrant des bâtiments.
+    # Ce notebook donne un exemple de calcul d'emprise de villes. Il ne s'agit pas
+    # de "tâche urbaine" au sens usuel du terme mais uniquement de calcul de zone
+    # convexe concentrant des bâtiments.
 
     # Par soucis de simplification :
-
-    #     les regroupements de bâtiments sont calculés à partir des centroïdes des objets géométriques
-    #     le calcul est réalisé sur un seul département. Il faudrait prendre en compte les départements limitrophes pour tenir compte des effets de bords.
+    #   - les regroupements de bâtiments sont calculés à partir des centroïdes
+    #     des objets géométriques
+    #   - le calcul est réalisé sur un seul département. Il faudrait prendre en
+    #     compte les départements limitrophes pour tenir compte des effets de bords.
     #     les regroupements sont obtenus à l'aide de l'algorithme DBSCAN
 
     url_cadastre = "https://cadastre.data.gouv.fr/data/etalab-cadastre/2020-07-01/shp/departements/"
@@ -56,6 +59,8 @@ def get_urbanisation_data(department, epsg):
 
 
 def get_parcel_limits(parcel):
+    # Calage de la grille : (on cherche à avoir des multiples de 1024
+    # pour obtenir un nombre entier d'image)
     min_x = math.floor(np.min(parcel.bounds.minx) / 1024) * 1024
     min_y = math.floor(np.min(parcel.bounds.miny) / 1024) * 1024
     max_x = math.ceil(np.max(parcel.bounds.maxx) / 1024) * 1024
@@ -64,6 +69,9 @@ def get_parcel_limits(parcel):
 
 
 def transform_data(data, limits):
+    # Les données sont transformées (par dilation et translation) afin de
+    # pouvoir tenir dans le nombre de pixels cible (ci-dessous : 1 pixel = 4 m).
+    # L'origine est placée à (0,0) pour une création correcte du raster.
     transformed_geo = data.geometry.translate(
         xoff=-limits["min_x"], yoff=-limits["min_y"], zoff=0.0
     )
@@ -72,6 +80,7 @@ def transform_data(data, limits):
 
 
 def get_dim_image(limits):
+    # Calcul de la hauteur et de la largeur de l'image en nombre de prixels :
     height = int((limits["max_y"] - limits["min_y"]) / 4)
     width = int((limits["max_x"] - limits["min_x"]) / 4)
     return (height, width)

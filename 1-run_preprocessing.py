@@ -3,26 +3,26 @@ import numpy as np
 from rasterio import features
 from sklearn.feature_extraction import image
 from sklearn.model_selection import train_test_split
-import keras 
+import keras
 
-# Les données sont disponibles par départements sur le site data.gouv.fr. 
-# Les fichiers mis à disposition sont des fichiers shapefile (polygones). 
+# Les données sont disponibles par départements sur le site data.gouv.fr.
+# Les fichiers mis à disposition sont des fichiers shapefile (polygones).
 # Il faut les traduire au format numérique (raster).
-# Le réseau de neurones nécessite en entrée un échantillon d'images qu'il doit 
+# Le réseau de neurones nécessite en entrée un échantillon d'images qu'il doit
 # apprendre à classer :
-#     - des images raster, qui sont des nombres (1 ou 0) varaint en fonction de 
-#       l'intensité des pixels. Sur ces images, les lignes délimitant les parcelles 
+#     - des images raster, qui sont des nombres (1 ou 0) varaint en fonction de
+#       l'intensité des pixels. Sur ces images, les lignes délimitant les parcelles
 #       seront des 1 tandis que les vides seront des 0.
-#     - ces images doivent être représentatives des images françaises c'est-à-dire 
-#       qu'elles doivent couvrir l'ensemble du territoire (échantillon d'images de 
-#       plusieurs départements différents en termes de structure) et l'ensemble des 
+#     - ces images doivent être représentatives des images françaises c'est-à-dire
+#       qu'elles doivent couvrir l'ensemble du territoire (échantillon d'images de
+#       plusieurs départements différents en termes de structure) et l'ensemble des
 #       patterns ou structure de parcelles cadastrales.
 
 
-# Les fichiers sont disponibles par départements. 
-# Seuls les départements 50 (Manche) et 51 (Marne) sont retenus pour la constitution 
-# de l'échantillon d'apprentissage. Ces deux départements nous ont paru suffisamment 
-# représentatives des structures champs ouverts et champs clôturés afin d'entraîner 
+# Les fichiers sont disponibles par départements.
+# Seuls les départements 50 (Manche) et 51 (Marne) sont retenus pour la constitution
+# de l'échantillon d'apprentissage. Ces deux départements nous ont paru suffisamment
+# représentatives des structures champs ouverts et champs clôturés afin d'entraîner
 # le réseau.
 
 dep_images_labels = {}
@@ -74,7 +74,7 @@ for dep in [50, 51]:
     # 25 000 images sont sélectionnées dans chaque département.
     patch = image.extract_patches_2d(data_3d, (256, 256), max_patches=25000)
 
-    # On sélectionne les images dont plus de 80 % de la surface sont dans une 
+    # On sélectionne les images dont plus de 80 % de la surface sont dans une
     # parcelle cadastrale (on évite les "trous" du cadastre)
     patch = prep.get_significant_images(patch, 0.8)
     # Identification des carreaux urbains = plus de 50 % de l'image en ville
@@ -114,8 +114,8 @@ x_train, x_validation, y_train, y_validation = train_test_split(
     x_train, y_train, test_size=0.2, random_state=42, shuffle=True
 )
 
-# On rajoute un nouvel axe pour les besoins de l'apprentissage (les images ont 
-# souvent un axe supplémentaire pour les couleurs : il y a par exemple trois 
+# On rajoute un nouvel axe pour les besoins de l'apprentissage (les images ont
+# souvent un axe supplémentaire pour les couleurs : il y a par exemple trois
 # canaux pour rouge, vert et bleu)).
 x_train = x_train[:, :, :, np.newaxis]
 x_test = x_test[:, :, :, np.newaxis]
@@ -128,4 +128,3 @@ np.save("data/x_test.npy", x_test)
 np.save("data/y_test.npy", y_test)
 np.save("data/x_validation.npy", x_validation)
 np.save("data/y_validation.npy", y_validation)
-

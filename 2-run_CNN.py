@@ -5,6 +5,15 @@ import matplotlib.pyplot as plt
 from matplotlib.image import imsave
 from PIL import Image
 
+# On cherche à batir un réseau de neurones afin de distinguer si les images
+# du cadastre appartiennent plutôt à la Manche (50) ou à la Champagne (51).
+# Visuellement, les parcelles ne semblent pas avoir la même forme. Il faudrait
+# que le réseau de neurones soit capable de détecter la structure des parcelles
+# et pas seulement la densité de celles-ci (auquel cas, un simple dénombrement
+# des pixels allumés suffirait à faire la distinction entre les deux types
+# d'occupation des sols).
+
+# On importe les données précédemment créées
 x_train = np.load("data/x_train.npy")
 y_train = np.load("data/y_train.npy")
 x_test = np.load("data/x_test.npy")
@@ -12,6 +21,13 @@ y_test = np.load("data/y_test.npy")
 x_validation = np.load("data/x_validation.npy")
 y_validation = np.load("data/y_validation.npy")
 
+# Le modèle est défini de façon séquentielle à l'aide de la librairie Keras.
+# Un premier modèle est défini. Il comporte 5 couches de convolutions.
+# La taille des filtres est de 5 pixels (kernel_sizes=(5,5)). Les filtres se
+# déplacent de 1 pixel à chaque fois (strides = (1,1)). Parfois, l'image est
+# prolongée sur les côtés afin de pouvoir calculer une valeur sur les
+# bords (padding='same'). La taille des filtres (filters) est fixée arbitrairement
+# à 32. Un perceptron multicouche est utilisé afin de trier les images.
 model = tt.define_model_structure(
     (256, 256, 1),
     filters=[32, 32, 32, 32, 32],
@@ -24,17 +40,22 @@ model = tt.define_model_structure(
     activations=["relu", "relu", "relu", "relu", "relu", "relu", "relu", "softmax"],
 )
 
+# Le réseau est compilé puis estimé (il voit 10 fois l'échantillon initial
+#  (epochs=10) sur des ensembles de 218 images (batch_size).
+model.compile(optimizer="adam", loss="categorical_crossentropy")
 history = model.fit(
     x_train,
     y_train,
-    epochs=2,
+    epochs=10,
     batch_size=218,
     shuffle=True,
     validation_data=(x_validation, y_validation),
 )
 
 
-## Choix nombre de couche de convolution
+#### Choix des hyper-paramètres ####
+
+## 1- Choix du nombre de couche de convolution (nb_couche)
 nb_params = []
 accuracies_train = []
 accuracies_test = []
@@ -74,7 +95,7 @@ for nb_couche in range(2, 7):
     accuracies_train.append(accuracy_train)
     nb_couches.append(f"{nb_couche}")
 
-
+# On peut visualiser la performance du réseau en fontion du nombre de couche
 plt.figure(figsize=(15, 15))
 
 acc_train = [np.float(a) * 100 for a in accuracies_train]
@@ -92,7 +113,7 @@ plt.xticks(lnb_params, labx, rotation=90)
 plt.xlabel("Nombre de parametres")
 plt.ylabel("Precision")
 
-## Choix taille des filtres
+## 2- Choix taille des filtres
 nb_params = []
 accuracies_train = []
 accuracies_test = []
@@ -133,7 +154,7 @@ for size in range(3, 10, 2):
     accuracies_train.append(accuracy_train)
     filter_size.append(f"{size}")
 
-
+# On peut visualiser la performance du réseau en fontion de la taille des filtres
 plt.figure(figsize=(15, 15))
 
 acc_train = [np.float(a) * 100 for a in accuracies_train]
@@ -153,9 +174,11 @@ plt.xticks(lnb_params, labx, rotation=90)
 plt.xlabel("Nombre de parametres")
 plt.ylabel("Precision")
 
-# see https://github.com/maxpumperla/hyperas
+# Pour en savoir plus, voir https://github.com/maxpumperla/hyperas. C'est une
+# libraire qui permet des réaliser un grid search de manière optimisée des
+# hyper-paramètres d'un modèle compilé avec Keras.
 
-# Final model
+# Définition du modèle final choisi après investigations.
 nb_couche = 6
 optimizer = "adam"
 loss = "categorical_crossentropy"
@@ -185,7 +208,15 @@ model.fit(
 accuracy_test = tt.get_accuracy(model, x_test, y_test)
 accuracy_train = tt.get_accuracy(model, x_train, y_train)
 
-# Mise en oeuvre de l'algorithme Grad-Cam
+#### Mise en oeuvre de l'algorithme Grad-Cam ####
+
+# Les réseaux de neurones ont un aspect "boîte noire". Il n'est pas possible
+# d'identifier immédiatement les variables qui impacte le plus la prédiction.
+# Dans le cas des convnets, plusieurs algorithmes ont été développés afin
+# d'identifier les structures perçues par le réseau.
+# L'une de ces méthodes est l'algorithme Grad-Cam présenté ici.
+
+# On récupère les prédictions sur les 15 première images
 predictions = model.predict(
     x_test[
         :15,
@@ -200,13 +231,18 @@ Y_true_label = [
     for c in np.argmax(y_test, axis=1)
 ]
 
+# On affiche le nom des couches du modèle (final) précédent
 names = [l.name for l in model.layers]
+
+# On récupère le nom de la dernière couche de convolution
 last_conv_layer_name = [n for n in names if n[:4] == "conv"][-1]
 
+# On récupère l'ensemble des couches entre la dernière couche de convolution
+#  (inclus) et le softmax final (exclus).
 no = [k for k in range(len(names)) if names[k] == last_conv_layer_name][0]
 classifier_layer_names = names[(no + 1) : -1]
 
-
+# On visualise le résultat de l'algorithme
 figure, axis = plt.subplots(3, 5, figsize=(20, 10))
 for i in range(15):
     img_path = x_test[
