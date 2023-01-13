@@ -13,7 +13,7 @@ def get_parcel_data(department):
     return parcel
 
 
-def get_urbanisation_data(department):
+def get_urbanisation_data(department, epsg):
 
     # Ce notebook donne un exemple de calcul d'emprise de villes. Il ne s'agit pas de "tâche urbaine" au sens usuel du terme mais uniquement de calcul de zone convexe concentrant des bâtiments.
 
@@ -48,9 +48,8 @@ def get_urbanisation_data(department):
     # calcul de l'enveloppe convexe des regroupements
     villages.geometry = [c.convex_hull for c in villages.geometry]
 
-    # ## On sauvegarde les résultats :##
-    # calcul des coordonées dans le systeme WSG84
-    villages = villages.to_crs(epsg=2154)
+    # calcul des coordonées dans le systeme souhaité
+    villages = villages.to_crs(epsg=epsg)
 
     return villages
 

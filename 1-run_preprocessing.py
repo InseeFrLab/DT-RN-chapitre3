@@ -27,7 +27,7 @@ for dep in [50, 51]:
     )
     np.save(f"data/raster_bounds_{dep}.npy", raster_bounds)
 
-    villages = prep.get_urbanisation_data(dep)
+    villages = prep.get_urbanisation_data(dep, 2154)
     villages.to_file(f"data/villages_{dep}.geojson", driver="GeoJSON")
     print("\n*** Cities data retrieved!\n")
 
