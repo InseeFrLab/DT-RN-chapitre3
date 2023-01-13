@@ -1,6 +1,6 @@
 # Chapitre 3 : Réseaux convolutifs et analyse d'images
 
-[![Onyxia](https://img.shields.io/badge/Launch-Datalab-orange?logo=R)](https://datalab.sspcloud.fr/launcher/ide/rstudio?autoLaunch=true&onyxia.friendlyName=«dt-chap3»&security.allowlist.enabled=false&service.image.custom.enabled=true&service.image.pullPolicy=«Always»&service.image.custom.version=«thomasfaria%2Fdt-rn-chapitre3»)
+[![Onyxia](https://img.shields.io/badge/Launch-Datalab-orange?logo=R)](https://datalab.sspcloud.fr/launcher/ide/vscode-python?autoLaunch=false&security.allowlist.enabled=false&service.image.pullPolicy=%C2%ABAlways%C2%BB&service.image.custom.enabled=true&service.image.custom.version=%C2%ABthomasfaria%2Fdt-rn-chapitre3%3Alatest%C2%BB&onyxia.friendlyName=%C2%ABdt-rn-chapitre3%C2%BB)
 [![Build](https://img.shields.io/github/actions/workflow/status/ThomasFaria/DT-RN-chapitre3/build-image.yaml?label=Build
 )](https://hub.docker.com/repository/docker/thomasfaria/dt-rn-chapitre3)
 
@@ -10,7 +10,7 @@ L'ensemble du codes sources utilisés dans ce chapitre est accompagné de son [i
 Celle-ci peut être utilisée pour vous éviter de télécharger les dépendances nécessaires à ce chapitre. Vous pouvez la récupérer avec la commande suivante :
 
 ```
-docker pull thomasfaria/dt-rn-chapitre3
+docker pull thomasfaria/dt-rn-chapitre3:latest
 ```
 
 Il vous est également possible de télécharger les dépendances localement en utilisant le fichier *requirements.txt*, à l'aide de la commande ```pip install -r requirements.txt```.
