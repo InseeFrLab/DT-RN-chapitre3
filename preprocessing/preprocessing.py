@@ -1,4 +1,5 @@
 import geopandas as gpd
+import pandas as pd
 from sklearn.cluster import DBSCAN
 import math
 import numpy as np
@@ -117,3 +118,66 @@ def keep_only_enough_pixels(Y, X, min_pixel):
     Y = Y[(non_zero_pixels >= min_pixel)]
     X = X[(non_zero_pixels >= min_pixel)]
     return (Y, X)
+
+
+def get_features(data):
+    area = data.geometry.area
+    perimeter = data.geometry.length
+    categ = data.categorie.reset_index(drop=True)
+    gravelius = perimeter / np.sqrt(area)
+    cx = data.geometry.centroid.x.apply(lambda x: int(x / 1024)).reset_index(drop=True)
+    cx.name = "cx"
+    cy = data.geometry.centroid.y.apply(lambda x: int(x / 1024)).reset_index(drop=True)
+    cy.name = "cy"
+    q1_gravelius = gravelius.quantile(0.33)
+    q3_gravelius = gravelius.quantile(0.66)
+
+    q1_area = area.quantile(0.33)
+    q3_area = area.quantile(0.66)
+
+    gravelius_code = pd.Series(
+        [
+            "allongee"
+            if a < q1_gravelius
+            else "compacte"
+            if a >= q3_gravelius
+            else "intermediaire"
+            for a in gravelius.values
+        ]
+    )
+    area_code = pd.Series(
+        [
+            "petite" if a < q1_area else "grande" if a >= q3_area else "moyenne"
+            for a in area.values
+        ]
+    )
+
+    gravelius = pd.get_dummies(gravelius_code).reset_index(drop=True)
+    area = pd.get_dummies(area_code).reset_index(drop=True)
+    categ = pd.get_dummies(categ).reset_index(drop=True)
+    categ.columns = ["manche", "marne", "ville"]
+
+    features = (
+        pd.concat([cx, cy, gravelius, area, categ], axis=1).groupby(["cx", "cy"]).sum()
+    )
+
+    somme = features.sum(axis=1).values.copy()
+    for c in features.columns:
+        features.loc[:, c] = 3 * features.loc[:, c] / somme
+
+    for i in features.index:
+        if features.loc[i, "ville"] > 0.8:
+            features.loc[i, "ville"] = 1
+            features.loc[i, "manche"] = 0
+            features.loc[i, "marne"] = 0
+        else:
+            if features.loc[i, "manche"] > 0.5:
+                features.loc[i, "ville"] = 0
+                features.loc[i, "manche"] = 1
+                features.loc[i, "marne"] = 0
+            else:
+                features.loc[i, "ville"] = 0
+                features.loc[i, "manche"] = 0
+                features.loc[i, "marne"] = 1
+
+    return features
