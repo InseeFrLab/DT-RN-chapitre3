@@ -1,6 +1,7 @@
 import preprocessing.preprocessing as prep
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
@@ -39,4 +40,4 @@ clf.fit(X_train, y_train)
 clf.score(X_test, y_test)
 
 y_pred = clf.predict(X_test)
-confusion_matrix(y_test, y_pred)
+confusion_matrix(np.argmax(np.array(y_test), axis=1), np.argmax(y_pred, axis=1))
