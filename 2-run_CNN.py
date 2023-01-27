@@ -58,7 +58,7 @@ history = model.fit(
 ## 1- Choix du nombre de couche de convolution (nb_couche)
 nb_params = []
 accuracies_train = []
-accuracies_test = []
+accuracies_validation = []
 nb_couches = []
 optimizer = "adam"
 loss = "categorical_crossentropy"
@@ -87,11 +87,11 @@ for nb_couche in range(2, 7):
         validation_data=(x_validation, y_validation),
     )
 
-    accuracy_test = tt.get_accuracy(model, x_test, y_test)
+    accuracy_validation = tt.get_accuracy(model, x_validation, y_validation)
     accuracy_train = tt.get_accuracy(model, x_train, y_train)
 
     nb_params.append(model.count_params())
-    accuracies_test.append(accuracy_test)
+    accuracies_validation.append(accuracy_validation)
     accuracies_train.append(accuracy_train)
     nb_couches.append(f"{nb_couche}")
 
@@ -99,12 +99,12 @@ for nb_couche in range(2, 7):
 plt.figure(figsize=(15, 15))
 
 acc_train = [np.float(a) * 100 for a in accuracies_train]
-acc_test = [np.float(a) * 100 for a in accuracies_test]
+acc_validation = [np.float(a) * 100 for a in accuracies_validation]
 lnb_params = [np.log(p) for p in nb_params]
 
 
 plt.plot(lnb_params, acc_train, label="Echantillon d'entrainement")
-plt.plot(lnb_params, acc_test, label="Echantillon test")
+plt.plot(lnb_params, acc_validation, label="Echantillon de validation")
 plt.legend()
 
 labx = [f"{n} ({c} couches)" for (n, c) in zip(nb_params, nb_couches)]
@@ -116,7 +116,7 @@ plt.ylabel("Precision")
 ## 2- Choix taille des filtres
 nb_params = []
 accuracies_train = []
-accuracies_test = []
+accuracies_validation = []
 filter_size = []
 optimizer = "adam"
 loss = "categorical_crossentropy"
@@ -146,11 +146,11 @@ for size in range(3, 10, 2):
         validation_data=(x_validation, y_validation),
     )
 
-    accuracy_test = tt.get_accuracy(model, x_test, y_test)
+    accuracy_validation = tt.get_accuracy(model, x_validation, y_validation)
     accuracy_train = tt.get_accuracy(model, x_train, y_train)
 
     nb_params.append(model.count_params())
-    accuracies_test.append(accuracy_test)
+    accuracies_validation.append(accuracy_validation)
     accuracies_train.append(accuracy_train)
     filter_size.append(f"{size}")
 
@@ -158,14 +158,14 @@ for size in range(3, 10, 2):
 plt.figure(figsize=(15, 15))
 
 acc_train = [np.float(a) * 100 for a in accuracies_train]
-acc_test = [np.float(a) * 100 for a in accuracies_test]
+acc_validation = [np.float(a) * 100 for a in accuracies_validation]
 lnb_params = [np.log(p) for p in nb_params]
 
 
 plt.title("Taille de la fenêtre\n (avec 5 couches de convolution)")
 
 plt.plot(lnb_params, acc_train, label="Echantillon d'entrainement")
-plt.plot(lnb_params, acc_test, label="Echantillon test")
+plt.plot(lnb_params, acc_validation, label="Echantillon de validation")
 plt.legend()
 
 labx = [f"{n} ({s})" for (n, s) in zip(nb_params, filter_size)]
