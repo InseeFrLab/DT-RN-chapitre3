@@ -1,7 +1,7 @@
 # Chapitre 3 : Réseaux convolutifs et analyse d'images
 
 [![Onyxia](https://img.shields.io/badge/Launch-Datalab-orange?logo=R)](https://datalab.sspcloud.fr/launcher/ide/vscode-python?autoLaunch=false&security.allowlist.enabled=false&service.image.pullPolicy=%C2%ABAlways%C2%BB&service.image.custom.enabled=true&service.image.custom.version=%C2%ABinseefrlab%2Fdt-rn-chapitre3%3Alatest%C2%BB&onyxia.friendlyName=%C2%ABdt-rn-chapitre3%C2%BB)
-[![Build](https://img.shields.io/github/actions/workflow/status/ThomasFaria/DT-RN-chapitre3/build-image.yaml?label=Build
+[![Build](https://img.shields.io/github/actions/workflow/status/InseeFrLab/DT-RN-chapitre3/build-image.yaml?label=Build
 )](https://hub.docker.com/repository/docker/inseefrlab/dt-rn-chapitre3)
 
 ## Prise en main
@@ -20,7 +20,7 @@ Cependant nous vous recommendons fortement l'utilisation d'[Onyxia](https://gith
 - Etape 0: Allez sur [https://datalab.sspcloud.fr/home](https://datalab.sspcloud.fr/home). Cliquer sur **Sign In** et ensuite **create an account** avec votre adresse email institutionnelle ou académique.
 - Etape 1: Cliquez [ICI](https://datalab.sspcloud.fr/launcher/ide/rstudio?autoLaunch=true&onyxia.friendlyName=«dt-chap4»&security.allowlist.enabled=false&service.image.custom.enabled=true&service.image.pullPolicy=«Always»&service.image.custom.version=«inseefrlab%2Fdt-rn-chapitre3») ou sur le badge orange en haut de la page pour lancer un service.
 - Etape 2: **Ouvrez** le service et suivez les instructions affichées concernant l'**identifiant** et le **mot de passe**.
-- Etape 3: **Clonez** le projet grâce à la commande suivant : ```git clone https://github.com/ThomasFaria/DT-RN-chapitre3.git```.
+- Etape 3: **Clonez** le projet grâce à la commande suivant : ```git clone https://github.com/InseeFrLab/DT-RN-chapitre3.git```.
 
 Tous les packages ont déjà été installés, vous devez en mesure de relancer tous les codes présents dans le projet.
 
@@ -30,14 +30,14 @@ Les programmes de cette partie sont écrit en **python**. Le réseau (CNN) est r
 
 Le code se divise en 4 scripts distincts :
 
-- [1-run_preprocessiong.py](https://github.com/ThomasFaria/DT-RN-chapitre3/blob/main/1-run_preprocessing.py) : Ce code consitue les échantillons de tests et d'entrainements de notre réseau de neurones. Pour cela :    
+- [1-run_preprocessiong.py](https://github.com/InseeFrLab/DT-RN-chapitre3/blob/main/1-run_preprocessing.py) : Ce code consitue les échantillons de tests et d'entrainements de notre réseau de neurones. Pour cela :    
     - Il importe les données du cadastre (département de la Manche et de la Marne), ainsi que les empreintes des villages ;
     - Il transforme les données géométrique en images (rasters) ;
     - Il tire des échantillons d'images et crée les labels (suppression des images peu ou pas du tout remplies, identification des villes) ;
     - Il réalise le sur_échantillonage des villes, sous représentées.
 
-- [2-run_CNN.py](https://github.com/ThomasFaria/DT-RN-chapitre3/blob/main/2-run_CNN.py) : Ce code permets de définir la structure du réseau de neurones que l'on souhaite estimer à l'aide de la librairie Keras. Il montre comment la sélection des hyperparamètres (nombre de couches de convolutions, profondeur et taille des filtres) peut être réalisées. Enfin il met illustre également l'algorithme de Grad-CAM.
+- [2-run_CNN.py](https://github.com/InseeFrLab/DT-RN-chapitre3/blob/main/2-run_CNN.py) : Ce code permets de définir la structure du réseau de neurones que l'on souhaite estimer à l'aide de la librairie Keras. Il montre comment la sélection des hyperparamètres (nombre de couches de convolutions, profondeur et taille des filtres) peut être réalisées. Enfin il met illustre également l'algorithme de Grad-CAM.
 
-- [3-run_random_forest.py](https://github.com/ThomasFaria/DT-RN-chapitre3/blob/main/3-run_random_forest.py) : Ce script présente un modèle alternatif pour réaliser la même tâche de classification. Il estime une forêt aléatoire à l'aide de features préalablement construites.
+- [3-run_random_forest.py](https://github.com/InseeFrLab/DT-RN-chapitre3/blob/main/3-run_random_forest.py) : Ce script présente un modèle alternatif pour réaliser la même tâche de classification. Il estime une forêt aléatoire à l'aide de features préalablement construites.
 
 Les codes ont été écrits par [Stéphanie Himpens](https://github.com/srhimp) (Insee / Banque de France).
